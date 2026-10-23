@@ -1,0 +1,87 @@
+* { box-sizing: border-box; }
+
+:root {
+  --bg: #eef2f6; --surface: #ffffff; --ink: #17263d; --muted: #6a7a90; --line: #d5dde8;
+  --accent: #0f766e; --accent-ink: #ffffff;
+  --high: #c2410c; --medium: #a16207; --low: #4b6584; --danger: #b42318;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #10192a; --surface: #182438; --ink: #e6edf7; --muted: #8d9db3; --line: #2a3a54;
+    --accent: #2dd4bf; --accent-ink: #06201d;
+    --high: #fb923c; --medium: #facc15; --low: #8fb0d6; --danger: #f87171;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+section { max-width: 640px; margin: 0 auto; padding: 24px 16px 60px; }
+[hidden] { display: none !important; }
+
+h1 { margin: 0; font-size: 2.2rem; letter-spacing: -0.02em; }
+.sub { margin: 4px 0 0; color: var(--muted); }
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+
+input, select, button {
+  font: inherit; color: inherit;
+  min-height: 44px; padding: 8px 12px;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--surface);
+}
+button { background: var(--accent); color: var(--accent-ink); border: 0; font-weight: 600; cursor: pointer; }
+button.secondary { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+button.link { background: none; color: var(--muted); text-decoration: underline; min-height: 0; padding: 4px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+#auth input, #auth button { display: block; width: 100%; margin-top: 10px; }
+.msg { color: var(--danger); min-height: 1.4em; }
+
+.add { display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+       background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+.add #title { grid-column: 1 / -1; border: 0; font-size: 1.1rem; padding-left: 4px; }
+.add #addBtn { grid-column: 1 / -1; }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; margin: 16px 0 10px; }
+.filters { display: flex; gap: 4px; }
+.filters button { background: var(--surface); color: var(--muted); border: 1px solid var(--line); }
+.filters button.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+#search { flex: 1; min-width: 120px; max-width: 220px; }
+
+ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+li { display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+     background: var(--surface); border: 1px solid var(--line); border-left: 5px solid var(--low); border-radius: 12px; }
+li.high { border-left-color: var(--high); }
+li.medium { border-left-color: var(--medium); }
+li.done .title { text-decoration: line-through; color: var(--muted); }
+li input[type=checkbox] { width: 24px; height: 24px; min-height: 0; flex: none; accent-color: var(--accent); }
+.body { flex: 1; min-width: 0; }
+.title { font-weight: 600; word-break: break-word; }
+.meta { font-size: 0.85rem; color: var(--muted); }
+.meta .late { color: var(--danger); font-weight: 600; }
+.edit-input { width: 100%; border-color: var(--accent); }
+.acts { display: flex; gap: 4px; }
+.acts button { background: none; color: var(--muted); min-height: 40px; padding: 4px 8px; }
+.acts .del:hover { color: var(--danger); }
+li.empty { justify-content: center; color: var(--muted); border-left-width: 1px; padding: 28px; }
+
+footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; color: var(--muted); }
+
+#toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+         background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px;
+         opacity: 0; pointer-events: none; transition: opacity 0.2s; max-width: 90%; }
+#toast.show { opacity: 1; }
+
+/* Phones */
+@media (max-width: 480px) {
+  .add { grid-template-columns: 1fr; }
+  .filters { width: 100%; }
+  .filters button { flex: 1; }
+  #search { max-width: none; }
+}
+@media (min-width: 768px) { section { padding-top: 48px; } }
