@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>My Todo</title>
+  <meta name="theme-color" content="#0f766e">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <section id="auth">
+    <h1>My Todo</h1>
+    <p class="sub">Log in to see your tasks on every device.</p>
+    <input id="email" type="email" placeholder="Email" autocomplete="email">
+    <input id="password" type="password" placeholder="Password (min 6 characters)" autocomplete="current-password">
+    <button id="loginBtn">Log in</button>
+    <button id="signupBtn" class="secondary">Create account</button>
+    <p id="authMsg" class="msg"></p>
+  </section>
+
+  <!-- TODO SCREEN -->
+  <section id="app" hidden>
+    <header>
+      <div>
+        <h1>My Tasks</h1>
+        <p class="sub" id="summary"></p>
+      </div>
+      <button id="logoutBtn" class="secondary">Log out</button>
+    </header>
+
+    <div class="add">
+      <input id="title" placeholder="What needs doing?" maxlength="200" autocomplete="off">
+      <select id="priority" aria-label="Priority">
+        <option value="low">Low</option>
+        <option value="medium" selected>Medium</option>
+        <option value="high">High</option>
+      </select>
+      <input id="dueDate" type="date" aria-label="Due date">
+      <button id="addBtn">Add task</button>
+    </div>
+
+    <div class="toolbar">
+      <div class="filters">
+        <button data-filter="all" class="active">All</button>
+        <button data-filter="active">Active</button>
+        <button data-filter="done">Done</button>
+      </div>
+      <input id="search" type="search" placeholder="Search tasks" aria-label="Search tasks">
+    </div>
+
+    <ul id="list"></ul>
+
+    <footer>
+      <span id="count"></span>
+      <button id="clearBtn" class="link">Clear completed</button>
+    </footer>
+  </section>
+
+  <div id="toast" role="status"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
