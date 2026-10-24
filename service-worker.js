@@ -1,4 +1,4 @@
-// Change this name each time you update your files so phones load the new version.
+// Change this name each time you update your files so phones load the new version. 
 const CACHE = "focus-v2";
 const FILES = ["./", "./index.html", "./style.css", "./app.js", "./manifest.json",
                "./icons/icon-192.png", "./icons/icon-512.png"];
