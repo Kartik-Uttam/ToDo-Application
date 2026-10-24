@@ -1,5 +1,5 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
+ 
 /* ---------- Colors (light) ---------- */
 :root {
   --bg: #f2f3fb; --card: #ffffff; --ink: #161a2e; --muted: #6b7190; --line: #e5e7f2;
