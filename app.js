@@ -2,7 +2,7 @@
 //  Focus: tasks with reminders. No login, no backend.
 //  Tasks live in this browser (localStorage).
 //  Phone notifications use ntfy.sh scheduled delivery.
-// ======================================================
+// ====================================================== 
 
 const KEY = "focus-tasks-v1";
 const SKEY = "focus-settings-v1";
