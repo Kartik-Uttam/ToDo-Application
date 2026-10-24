@@ -3,68 +3,173 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>My Todo</title>
-  <meta name="theme-color" content="#0f766e">
+  <title>Focus: Tasks and Reminders</title>
+  <meta name="theme-color" content="#5b4bff">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script>
+    // Apply the saved theme before the page paints (prevents a flash)
+    try {
+      var s = JSON.parse(localStorage.getItem("focus-settings-v1"));
+      if (s && s.theme && s.theme !== "auto") document.documentElement.setAttribute("data-theme", s.theme);
+    } catch (e) {}
+  </script>
 </head>
 <body>
+<div class="app">
 
-  <!-- LOGIN SCREEN -->
-  <section id="auth">
-    <h1>My Todo</h1>
-    <p class="sub">Log in to see your tasks on every device.</p>
-    <input id="email" type="email" placeholder="Email" autocomplete="email">
-    <input id="password" type="password" placeholder="Password (min 6 characters)" autocomplete="current-password">
-    <button id="loginBtn">Log in</button>
-    <button id="signupBtn" class="secondary">Create account</button>
-    <p id="authMsg" class="msg"></p>
+  <header class="top">
+    <div>
+      <p class="date" id="today"></p>
+      <h1><span id="greeting">Hello</span> <span class="wave" aria-hidden="true">👋</span></h1>
+    </div>
+    <div class="top-btns">
+      <button class="icon-btn" id="themeBtn" aria-label="Change theme"></button>
+      <button class="icon-btn" id="settingsBtn" aria-label="Notifications and settings">
+        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/></svg>
+        <span class="dot" id="bellDot"></span>
+      </button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <div class="ring">
+      <svg viewBox="0 0 80 80" width="88" height="88">
+        <circle cx="40" cy="40" r="34" class="ring-bg"/>
+        <circle cx="40" cy="40" r="34" class="ring-fg" id="ringFg" transform="rotate(-90 40 40)"/>
+      </svg>
+      <span id="pct">0%</span>
+    </div>
+    <div class="hero-text">
+      <p class="hero-title" id="heroTitle">Nothing planned yet</p>
+      <p class="hero-sub" id="heroSub">Tap + to add your first task</p>
+      <p class="hero-next" id="heroNext" hidden></p>
+    </div>
   </section>
 
-  <!-- TODO SCREEN -->
-  <section id="app" hidden>
-    <header>
-      <div>
-        <h1>My Tasks</h1>
-        <p class="sub" id="summary"></p>
-      </div>
-      <button id="logoutBtn" class="secondary">Log out</button>
-    </header>
+  <nav class="chips" id="chips" aria-label="Filter tasks">
+    <button data-f="all" class="on">All <b id="nAll">0</b></button>
+    <button data-f="today">Today <b id="nToday">0</b></button>
+    <button data-f="upcoming">Upcoming <b id="nUp">0</b></button>
+    <button data-f="done">Done <b id="nDone">0</b></button>
+  </nav>
 
-    <div class="add">
-      <input id="title" placeholder="What needs doing?" maxlength="200" autocomplete="off">
-      <select id="priority" aria-label="Priority">
-        <option value="low">Low</option>
-        <option value="medium" selected>Medium</option>
-        <option value="high">High</option>
-      </select>
-      <input id="dueDate" type="date" aria-label="Due date">
-      <button id="addBtn">Add task</button>
+  <ul id="list" class="list"></ul>
+
+  <div id="empty" class="empty" hidden>
+    <svg class="empty-art" viewBox="0 0 120 120" width="120" height="120" fill="none" aria-hidden="true">
+      <rect x="26" y="20" width="68" height="84" rx="12" style="fill:var(--accent-soft);stroke:var(--accent)" stroke-width="3"/>
+      <rect x="44" y="12" width="32" height="16" rx="6" style="fill:var(--accent)"/>
+      <path d="M40 52h40M40 68h28M40 84h34" style="stroke:var(--accent)" stroke-width="4" stroke-linecap="round" opacity=".45"/>
+      <circle cx="90" cy="90" r="16" style="fill:var(--ok)"/>
+      <path d="M83 90l5 5 9-10" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <p id="emptyText"></p>
+  </div>
+</div>
+
+<button class="fab" id="fab" aria-label="Add task">
+  <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+
+<div class="backdrop" id="backdrop" hidden></div>
+
+<!-- ADD / EDIT TASK -->
+<div class="sheet" id="taskSheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <div class="grab"></div>
+  <h2 id="sheetTitle">New task</h2>
+  <form id="taskForm" autocomplete="off">
+    <label class="lbl" for="fTitle">Task</label>
+    <input id="fTitle" maxlength="120" placeholder="What do you need to do?">
+
+    <label class="lbl" for="fNotes">Notes (optional)</label>
+    <textarea id="fNotes" rows="2" maxlength="300" placeholder="Add details"></textarea>
+
+    <span class="lbl">Priority</span>
+    <div class="seg" id="prioSeg">
+      <button type="button" data-p="low" aria-pressed="false">Low</button>
+      <button type="button" data-p="medium" aria-pressed="true">Medium</button>
+      <button type="button" data-p="high" aria-pressed="false">High</button>
     </div>
 
-    <div class="toolbar">
-      <div class="filters">
-        <button data-filter="all" class="active">All</button>
-        <button data-filter="active">Active</button>
-        <button data-filter="done">Done</button>
-      </div>
-      <input id="search" type="search" placeholder="Search tasks" aria-label="Search tasks">
+    <label class="lbl" for="fDue">Due date</label>
+    <input id="fDue" type="date">
+
+    <label class="lbl" for="fRemind">Remind me</label>
+    <input id="fRemind" type="datetime-local">
+    <div class="quick">
+      <button type="button" data-quick="10m">In 10 min</button>
+      <button type="button" data-quick="1h">In 1 hour</button>
+      <button type="button" data-quick="eve">Evening</button>
+      <button type="button" data-quick="tom">Tomorrow 9am</button>
+      <button type="button" data-quick="none">No reminder</button>
     </div>
 
-    <ul id="list"></ul>
+    <div class="row">
+      <button type="button" class="btn danger" id="deleteBtn" hidden>Delete</button>
+      <button type="button" class="btn ghost" id="cancelBtn">Cancel</button>
+      <button type="submit" class="btn primary">Save</button>
+    </div>
+  </form>
+</div>
 
-    <footer>
-      <span id="count"></span>
-      <button id="clearBtn" class="link">Clear completed</button>
-    </footer>
-  </section>
+<!-- SETTINGS -->
+<div class="sheet" id="settingsSheet" role="dialog" aria-modal="true" aria-labelledby="setTitle" hidden>
+  <div class="grab"></div>
+  <h2 id="setTitle">Notifications and data</h2>
 
-  <div id="toast" role="status"></div>
+  <div class="block">
+    <h3>Phone notifications</h3>
+    <p class="hint">Works even when this app is closed. It uses the free <b>ntfy</b> app.</p>
+    <div id="phoneOff">
+      <button class="btn primary" id="phoneOn">Turn on phone notifications</button>
+    </div>
+    <div id="phoneOn2" hidden>
+      <ol class="steps">
+        <li>Install the free <b>ntfy</b> app (Google Play, App Store or F-Droid).</li>
+        <li>Open it, tap <b>+</b>, and subscribe to this topic:</li>
+      </ol>
+      <div class="topic"><code id="topicText"></code><button class="btn ghost small" id="copyTopic">Copy</button></div>
+      <ol class="steps" start="3">
+        <li>Press the test button. Your phone should buzz.</li>
+      </ol>
+      <div class="row left">
+        <button class="btn primary" id="testBtn">Send test</button>
+        <button class="btn ghost" id="newTopic">New topic</button>
+        <button class="btn ghost" id="phoneOffBtn">Turn off</button>
+      </div>
+    </div>
+    <p class="hint small">Phone reminders are scheduled up to 3 days ahead. For a later reminder, open this app within 3 days of the time. Keep sensitive details out of task names, because messages pass through ntfy.sh.</p>
+  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <script src="app.js"></script>
+  <div class="block">
+    <h3>This device</h3>
+    <p class="hint" id="browserStatus"></p>
+    <button class="btn ghost" id="browserBtn">Enable browser notifications</button>
+  </div>
+
+  <div class="block">
+    <h3>Your data</h3>
+    <p class="hint">Tasks are saved on this device only, so there is no login. Export a backup to move them elsewhere.</p>
+    <div class="row left">
+      <button class="btn ghost" id="exportBtn">Export</button>
+      <button class="btn ghost" id="importBtn">Import</button>
+      <button class="btn danger" id="wipeBtn">Delete all</button>
+    </div>
+    <input type="file" id="importFile" accept="application/json" hidden>
+  </div>
+
+  <div class="row"><button class="btn primary" id="closeSettings">Done</button></div>
+</div>
+
+<div class="toast" id="toast" role="status"><span id="toastText"></span><button id="toastAct" hidden></button></div>
+
+<script src="app.js"></script>
 </body>
 </html>
