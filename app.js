@@ -4,7 +4,7 @@
 //  Phone notifications use ntfy.sh scheduled delivery.
 // ======================================================
 
-const KEY = "focus-tasks-v1";
+const KEY = "focus-tasks-v1"; 
 const SKEY = "focus-settings-v1";
 const NTFY = "https://ntfy.sh";
 const MAX_AHEAD = 71 * 3600; // ntfy can schedule at most 3 days ahead (we stay just under)
